@@ -3,42 +3,33 @@
 
 #define BUTTON_PIN 0
 #define RELAY_PIN 1
-#define ACCUMULATOR_CAPACITY 100
-#define MANUALLY_FACTOR 36
-#define LARGE_BUTTON_DELAY 5000
-#define SHORT_BUTTON_DELAY 300
-#define TICK_DELAY 30
-#define ONE_SECOND 1000
+#define LONG_DELAY 5000
+#define SHORT_DELAY 250
+#define MANUAL_FACTOR 10 // 3600
+#define ONE_SECOND SHORT_DELAY * 4
+#define MANUAL_CAPACITY MANUAL_FACTOR * ONE_SECOND
 
 
 ButtonAndSensor::ButtonAndSensor(){
-}
-
-ButtonAndSensor::checkSensor(){
-    delay(TICK_DELAY)
-}
-
-ButtonAndSensor::checkButton(){
-    bool isRead = digitalRead(BUTTON);
-    if(isRead){
-        delay(TICK_DELAY);
-        return;
-    }
-    _isToggled = !_isToggled;
-    _accumulator = _isToggled ? BS_ACCUMULATOR_CAPACITY * MANUALLY_FACTOR : 0;     
-    digitalWrite(RELAY_PIN, isToggled);
-    delay(_isToggled ? SHORT_BUTTON_DELAY : LARGE_BUTTON_DELAY);
-}
-
-ButtonAndSensor::setup(){
     pinMode(BUTTON_PIN, INPUT);
     pinMode(RELAY_PIN, OUTPUT);
+    _accumulator = 0;
 }
 
-ButtonAndSensor::loop(){
+void ButtonAndSensor::checkSensor(){
+}
+
+void ButtonAndSensor::checkButton(){
+    if(!digitalRead(BUTTON_PIN)) return;
+    _accumulator = _accumulator == 0 ? MANUAL_CAPACITY : SHORT_DELAY;
+}
+
+void ButtonAndSensor::checkBoth(){
     checkSensor();
     checkButton();
-    delay(ONE_SECOND);
-    if(_accumulator > 0) _accumulator--;
-    if(_accumulator == 0) digitalWrite(RELAY_PIN, LOW);
+    bool isLast = _accumulator == SHORT_DELAY;
+    if(_accumulator > 0) _accumulator -= SHORT_DELAY;
+    digitalWrite(RELAY_PIN, _accumulator > 0);
+    delay(isLast ? LONG_DELAY : SHORT_DELAY);
 }
+

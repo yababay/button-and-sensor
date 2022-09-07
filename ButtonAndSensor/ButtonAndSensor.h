@@ -6,15 +6,13 @@
 class ButtonAndSensor {
 
     public:
-        void ButtonAndSensor();
+        ButtonAndSensor();
         void checkButton();
         void checkSensor();
-        void loop();
-        void setup();
+        void checkBoth();
 
     private:
-        int _accumulator;
-        bool _isToggled;
+        uint32_t _accumulator;
 };
 
 #endif
