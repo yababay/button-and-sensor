@@ -1,0 +1,3 @@
+ButtonAndSensor KEYWORD1
+checkButton KEYWORD2
+checkSensor KEYWORD1
